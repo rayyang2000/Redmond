@@ -15,8 +15,6 @@
 #include <windows.h>
 #include <string>
 
-// TODO: reference additional headers your program requires here
-
 // Fix the incompatibility between Windows sal.h and g++ compiler.
 #define _Field_size_opt_(x)
 #define _Out_writes_bytes_to_(x, y)
@@ -125,7 +123,16 @@ BOOL WINAPI DllMain(
     return TRUE;
 }
 
-DECLARE_API(genguid) {
+DECLARE_API(help)
+{
+    dprintf("Redmond Debug Extension\n");
+    dprintf("!libredmond.help - show this help message.\n");
+    dprintf("!libredmond.genguid <address> - convert a 16-byte memory block to a GUID.\n");
+    dprintf("                                To find a WPP GUID, run 'x <mod>!*ctlguid*'.\n");
+}
+
+DECLARE_API(genguid)
+{
     ULONG_PTR Address = 0;
     ULONG64 Value;
     PCSTR Remainder;
@@ -213,4 +220,3 @@ DECLARE_API(genguid) {
 
     dprintf("}\n");
 }
-

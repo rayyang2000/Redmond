@@ -107,7 +107,9 @@ ExtensionApiVersion(
 // Routine called by debugger after load
 //
 
+extern "C"
 VOID
+__declspec(dllexport)
 CheckVersion(
         VOID
         ) {
@@ -122,88 +124,6 @@ BOOL WINAPI DllMain(
 {
     return TRUE;
 }
-
-/***********************************************************
- * !help
- *
- * Purpose: WINDBG will call this API when the user types !help
- *          
- *
- *  Parameters:
- *     N/A
- *
- *  Return Values:
- *     N/A
- *
- ***********************************************************/
-DECLARE_API(help) {
-    dprintf("Toby's Debug Extensions\n\n");
-    dprintf("!dumpstrings <ADDRESS register> - Dumps 20 strings in"\
-       "ANSI/UNICODE using this address as a pointer to strings (useful for" \
-       "dumping strings on the stack) \n");
-    /* String Split so it is readable in this article. */
-}
-
-/***********************************************************
- * !dumpstrings
- *
- * Purpose: WINDBG will call this API when the user types !dumpstrings
- *          
- *
- *  Parameters:
- *     !dumpstrings or !dumpstrings <ADDRESS register>
- *
- *  Return Values:
- *     N/A
- *
- ***********************************************************/
-DECLARE_API(dumpstrings) {
-    static ULONG_PTR Address = 0;
-    ULONG_PTR GetAddress = 0, StringAddress;
-    ULONG Index = 0, Bytes;
-    WCHAR MyString[51] = {0};
-    PCSTR Remainder;
-
-
-    GetExpressionEx(args, &GetAddress, &Remainder);
-
-    if (GetAddress != 0) {
-        Address = GetAddress;
-    }
-
-    dprintf("STACK   ADDR   STRING \n");
-
-    for (Index = 0; Index < 4 * 20; Index += 4) {
-        memset(MyString, 0, sizeof (MyString));
-
-        Bytes = 0;
-
-        ReadMemory(Address + Index, &StringAddress,
-                sizeof (StringAddress), &Bytes);
-
-        if (Bytes) {
-            Bytes = 0;
-
-            ReadMemory(StringAddress, MyString,
-                    sizeof (MyString) - 2, &Bytes);
-
-            if (Bytes) {
-                dprintf("%p : %p = (UNICODE) \"%ws\"\n",
-                        Address + Index, StringAddress, MyString);
-                dprintf("%p : %p = (ANSI)    \"%s\"\n",
-                        Address + Index, StringAddress, MyString);
-            } else {
-                dprintf("%p : %p =  Address Not Valid\n",
-                        Address + Index, StringAddress);
-            }
-        } else {
-            dprintf("%p : Address Not Valid\n", Address + Index);
-        }
-    }
-
-    Address += Index;
-}
-
 
 DECLARE_API(genguid) {
     ULONG_PTR Address = 0;

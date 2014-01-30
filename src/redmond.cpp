@@ -129,6 +129,7 @@ DECLARE_API(help)
     dprintf("!libredmond.help - show this help message.\n");
     dprintf("!libredmond.genguid <address> - convert a 16-byte memory block to a GUID.\n");
     dprintf("                                To find a WPP GUID, run 'x <mod>!*ctlguid*'.\n");
+    dprintf("!libredmond.maskirq <IRQ#> - mask an interrupt in IOAPIC.\n");
 }
 
 DECLARE_API(genguid)
@@ -219,4 +220,45 @@ DECLARE_API(genguid)
     }
 
     dprintf("}\n");
+}
+
+DECLARE_API(maskirq)
+{
+    ULONG64 IRQ;
+    PCSTR Remainder;
+
+    BOOL ret = GetExpressionEx(args, &IRQ, &Remainder);
+    if (ret == FALSE) {
+        dprintf("Parameter is wrong: %s", args);
+        return;
+    }
+
+    // TODO: How to get this value dynamically?
+    ULONG64 IOAPICAddress = 0xFEC00000;
+    ULONG32 Value = IRQ * 2 + 0x10;
+    ULONG Size;
+    
+    WritePhysical(IOAPICAddress, &Value, sizeof(BYTE), &Size);
+    if (Size != sizeof(BYTE)) {
+        dprintf("Cannot write to IOREGSEL in IOAPIC @ %I64x", IOAPICAddress);
+        return;
+    }
+    
+    ReadPhysical(IOAPICAddress + 0x10, &Value, sizeof(Value), &Size);
+    if (Size != sizeof(Value)) {
+        dprintf("Cannot read from IOWIN in IOAPIC @ %I64x", IOAPICAddress + 0x10);
+        return;
+    }
+    
+    dprintf("Masking IRQ%I64x: %08x -> ", IRQ, Value);
+    Value = (Value | (1 << 16));
+    dprintf("%08x\n", Value);
+
+    WritePhysical(IOAPICAddress + 0x10, &Value, sizeof(Value), &Size);
+    if (Size != sizeof(Value)) {
+        dprintf("Cannot write to IOWIN in IOAPIC @ %I64x", IOAPICAddress + 0x10);
+        return;
+    }
+    
+    dprintf("Done.");
 }

@@ -35,7 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/redmond.o
+	${OBJECTDIR}/src/redmond.o
 
 
 # C Compiler Flags
@@ -62,10 +62,10 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libRedmond.${CND_DLIB_EXT}: ${OBJECTF
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libRedmond.${CND_DLIB_EXT} ${OBJECTFILES} ${LDLIBSOPTIONS} -Wl,--out-implib,libredmond.a -shared
 
-${OBJECTDIR}/redmond.o: redmond.cpp 
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/redmond.o: src/redmond.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -I. -I/cygdrive/C/Program\ Files\ \(x86\)/Windows\ Kits/8.1/Debuggers/inc  -MMD -MP -MF $@.d -o ${OBJECTDIR}/redmond.o redmond.cpp
+	$(COMPILE.cc) -g -I. -I/cygdrive/C/Program\ Files\ \(x86\)/Windows\ Kits/8.1/Debuggers/inc  -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/redmond.o src/redmond.cpp
 
 # Subprojects
 .build-subprojects:
